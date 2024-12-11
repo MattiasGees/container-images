@@ -27,7 +27,7 @@ RUN tar zvxf spiffe-helper-v${SPIFFE_HELPER_VERSION}.tar.gz
 RUN wget https://github.com/MattiasGees/spiffe-aws-assume-role/releases/download/v${SPIFFE_AWS_ASSUME_ROLE_VERSION}/spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
 RUN tar zvxf spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
 RUN wget https://github.com/sigstore/cosign/releases/latest/download/cosign-${TARGETOS}-${TARGETARCH}
-RUN wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/X86_64/${TARGETOS^}/aws_signing_helper
+RUN wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/X86_64/Linux/aws_signing_helper
 
 FROM mattiasgees/ubuntu-tools:${BUILD_TAG} 
 
