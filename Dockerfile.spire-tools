@@ -11,6 +11,15 @@ ARG BUILD_TAG=latest
 
 FROM --platform=$BUILDPLATFORM mattiasgees/ubuntu-tools:${BUILD_TAG} AS builder
 
+ARG SPIRE_VERSION
+ARG SPIFFE_HELPER_VERSION
+ARG SPIFFE_AWS_ASSUME_ROLE_VERSION
+ARG ROLESANYWHERE_VERSION
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
+
 RUN wget https://github.com/spiffe/spire/releases/download/v${SPIRE_VERSION}/spire-${SPIRE_VERSION}-${TARGETOS}-${TARGETARCH}-musl.tar.gz
 RUN tar zvxf spire-${SPIRE_VERSION}-${TARGETOS}-${TARGETARCH}-musl.tar.gz
 RUN wget https://github.com/spiffe/spiffe-helper/releases/download/v${SPIFFE_HELPER_VERSION}/spiffe-helper-v${SPIFFE_HELPER_VERSION}.tar.gz
@@ -21,6 +30,15 @@ RUN wget https://github.com/sigstore/cosign/releases/latest/download/cosign-${TA
 RUN wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/X86_64/${TARGETOS}/aws_signing_helper
 
 FROM mattiasgees/ubuntu-tools:${BUILD_TAG} 
+
+ARG SPIRE_VERSION
+ARG SPIFFE_HELPER_VERSION
+ARG SPIFFE_AWS_ASSUME_ROLE_VERSION
+ARG ROLESANYWHERE_VERSION
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
 
 # explicitly set user/group IDs
 RUN set -eux; \
