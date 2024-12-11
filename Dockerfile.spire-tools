@@ -1,5 +1,3 @@
-FROM --platform=$BUILDPLATFORM mattiasgees/ubuntu-tools:latest AS builder
-
 # https://github.com/spiffe/spire/releases
 ARG SPIRE_VERSION=1.11.0
 # https://github.com/spiffe/spiffe-helper/releases
@@ -8,6 +6,8 @@ ARG SPIFFE_HELPER_VERSION=0.9.0
 ARG SPIFFE_AWS_ASSUME_ROLE_VERSION=0.0.1-alpha4
 # https://docs.aws.amazon.com/rolesanywhere/latest/userguide/credential-helper.html
 ARG ROLESANYWHERE_VERSION=1.3.0
+
+FROM --platform=$BUILDPLATFORM mattiasgees/ubuntu-tools:latest AS builder
 
 RUN wget https://github.com/spiffe/spire/releases/download/v${SPIRE_VERSION}/spire-${SPIRE_VERSION}-${TARGETOS}-${TARGETARCH}-musl.tar.gz
 RUN tar zvxf spire-${SPIRE_VERSION}-${TARGETOS}-${TARGETARCH}-musl.tar.gz
