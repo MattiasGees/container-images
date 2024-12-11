@@ -1,0 +1,65 @@
+# https://github.com/spiffe/spire/releases
+ARG SPIRE_VERSION=1.11.0
+# https://github.com/spiffe/spiffe-helper/releases
+ARG SPIFFE_HELPER_VERSION=0.9.0
+# https://github.com/MattiasGees/spiffe-aws-assume-role/releases
+ARG SPIFFE_AWS_ASSUME_ROLE_VERSION=0.0.1-alpha4
+# https://docs.aws.amazon.com/rolesanywhere/latest/userguide/credential-helper.html
+ARG ROLESANYWHERE_VERSION=1.3.0
+
+ARG BUILD_TAG=latest
+
+FROM --platform=$BUILDPLATFORM mattiasgees/ubuntu-tools:${BUILD_TAG} AS builder
+
+ARG SPIRE_VERSION
+ARG SPIFFE_HELPER_VERSION
+ARG SPIFFE_AWS_ASSUME_ROLE_VERSION
+ARG ROLESANYWHERE_VERSION
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
+
+RUN wget https://github.com/spiffe/spire/releases/download/v${SPIRE_VERSION}/spire-${SPIRE_VERSION}-${TARGETOS}-${TARGETARCH}-musl.tar.gz
+RUN tar zvxf spire-${SPIRE_VERSION}-${TARGETOS}-${TARGETARCH}-musl.tar.gz
+RUN wget https://github.com/spiffe/spiffe-helper/releases/download/v${SPIFFE_HELPER_VERSION}/spiffe-helper-v${SPIFFE_HELPER_VERSION}.tar.gz
+RUN tar zvxf spiffe-helper-v${SPIFFE_HELPER_VERSION}.tar.gz
+RUN wget https://github.com/MattiasGees/spiffe-aws-assume-role/releases/download/v${SPIFFE_AWS_ASSUME_ROLE_VERSION}/spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
+RUN tar zvxf spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
+RUN wget https://github.com/sigstore/cosign/releases/latest/download/cosign-${TARGETOS}-${TARGETARCH}
+RUN wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/X86_64/Linux/aws_signing_helper
+
+FROM mattiasgees/ubuntu-tools:${BUILD_TAG} 
+
+ARG SPIRE_VERSION
+ARG SPIFFE_HELPER_VERSION
+ARG SPIFFE_AWS_ASSUME_ROLE_VERSION
+ARG ROLESANYWHERE_VERSION
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
+
+# explicitly set user/group IDs
+RUN set -eux; \
+	groupadd -r postgres --gid=999; \
+# https://salsa.debian.org/postgresql/postgresql-common/blob/997d842ee744687d99a2b2d95c1083a2615c79e8/debian/postgresql-common.postinst#L32-35
+	useradd -r -g postgres --uid=999 --home-dir=/var/lib/postgresql --shell=/bin/bash postgres; \
+# also create the postgres user's home directory with appropriate permissions
+# see https://github.com/docker-library/postgres/issues/274
+	mkdir -p /var/lib/postgresql; \
+	chown -R postgres:postgres /var/lib/postgresql
+
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /spire-${SPIRE_VERSION}/bin/spire-server /usr/bin/spire-server
+COPY --from=builder /spire-${SPIRE_VERSION}/bin/spire-agent /usr/bin/spire-agent
+COPY --from=builder /spiffe-helper /usr/bin/spiffe-helper
+COPY --from=builder /spiffe-aws-assume-role /usr/bin/spiffe-aws-assume-role
+COPY --from=builder /cosign-${TARGETOS}-${TARGETARCH} /usr/bin/cosign
+COPY --from=builder /aws_signing_helper /usr/bin/aws_signing_helper
+RUN wget https://awscli.amazonaws.com/awscli-exe-${TARGETOS}-x86_64.zip && unzip awscli-exe-${TARGETOS}-x86_64.zip &&  ./aws/install && rm -rf aws
+
+ENTRYPOINT ["tail", "-f", "/dev/null"]
