@@ -1,4 +1,4 @@
-name: Docker Image Tools
+name: Docker Image tools
 
 on:
     push:
@@ -7,7 +7,7 @@ on:
         branches: [ "main" ]
 
 jobs:
-  docker:
+  docker-ubuntu-tools:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,6 +32,25 @@ jobs:
           push: true
           tags: mattiasgees/ubuntu-tools:${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
 
+  docker-spire-tools:
+    needs: docker-ubuntu-tools
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build and push spire-tools
         uses: docker/build-push-action@v6
         with:
@@ -39,3 +58,5 @@ jobs:
           push: true
           file: Dockerfile.spire-tools
           tags: mattiasgees/spire-tools:${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
+          build-args: |
+            BUILD_TAG=${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
