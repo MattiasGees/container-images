@@ -1,11 +1,11 @@
 # https://github.com/spiffe/spire/releases
-ARG SPIRE_VERSION=1.11.0
+ARG SPIRE_VERSION=1.11.1
 # https://github.com/spiffe/spiffe-helper/releases
 ARG SPIFFE_HELPER_VERSION=0.9.0
 # https://github.com/MattiasGees/spiffe-aws-assume-role/releases
 ARG SPIFFE_AWS_ASSUME_ROLE_VERSION=0.0.1-alpha4
 # https://docs.aws.amazon.com/rolesanywhere/latest/userguide/credential-helper.html
-ARG ROLESANYWHERE_VERSION=1.3.0
+ARG ROLESANYWHERE_VERSION=1.4.0
 
 ARG BUILD_TAG=latest
 
@@ -27,7 +27,15 @@ RUN tar zvxf spiffe-helper-v${SPIFFE_HELPER_VERSION}.tar.gz
 RUN wget https://github.com/MattiasGees/spiffe-aws-assume-role/releases/download/v${SPIFFE_AWS_ASSUME_ROLE_VERSION}/spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
 RUN tar zvxf spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
 RUN wget https://github.com/sigstore/cosign/releases/latest/download/cosign-${TARGETOS}-${TARGETARCH}
-RUN wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/X86_64/Linux/aws_signing_helper
+RUN if [ "${TARGETARCH}" = "amd64" ]; then \
+	ARCH="X86_64"; \
+	elif [ "${TARGETARCH}" = "arm64" ]; then \
+	ARCH="Aarch64"; \
+	else \
+	echo "Unsupported architecture: ${TARGETARCH}"; \
+	exit 1; \
+	fi; \
+	wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/${ARCH}/Linux/aws_signing_helper
 
 FROM mattiasgees/ubuntu-tools:${BUILD_TAG} 
 
@@ -60,6 +68,14 @@ COPY --from=builder /spiffe-helper /usr/bin/spiffe-helper
 COPY --from=builder /spiffe-aws-assume-role /usr/bin/spiffe-aws-assume-role
 COPY --from=builder /cosign-${TARGETOS}-${TARGETARCH} /usr/bin/cosign
 COPY --from=builder /aws_signing_helper /usr/bin/aws_signing_helper
-RUN wget https://awscli.amazonaws.com/awscli-exe-${TARGETOS}-x86_64.zip && unzip awscli-exe-${TARGETOS}-x86_64.zip &&  ./aws/install && rm -rf aws
+RUN if [ "${TARGETARCH}" = "amd64" ]; then \
+	ARCH="x86_64"; \
+	elif [ "${TARGETARCH}" = "arm64" ]; then \
+	ARCH="aarch64"; \
+	else \
+	echo "Unsupported architecture: ${TARGETARCH}"; \
+	exit 1; \
+	fi; \
+	wget https://awscli.amazonaws.com/awscli-exe-${TARGETOS}-${ARCH}.zip && unzip awscli-exe-${TARGETOS}-${ARCH}.zip && ./aws/install && rm -rf aws
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
