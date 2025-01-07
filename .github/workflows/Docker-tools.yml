@@ -54,8 +54,7 @@ jobs:
       - name: Build and push spire-tools
         uses: docker/build-push-action@v6
         with:
-          # Currently only amd64 as spiffe-helper doesn't release arm64 binaries
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           file: Dockerfile.spire-tools
           tags: mattiasgees/spire-tools:${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
