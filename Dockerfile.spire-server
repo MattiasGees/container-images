@@ -11,8 +11,8 @@ ARG BUILDPLATFORM
 ARG TARGETOS
 ARG TARGETARCH
 
-RUN wget https://github.com/boxboat/spire-tpm-plugin/releases/download/v${SPIRE_TPM_PLUGIN}/spire_tpm_plugin_tpm_attestor_agent_linux_${TARGETARCH}_v${SPIRE_TPM_PLUGIN}.tar.gz
-RUN tar zvxf spire_tpm_plugin_tpm_attestor_agent_linux_${TARGETARCH}_v${SPIRE_TPM_PLUGIN}.tar.gz
+RUN wget https://github.com/boxboat/spire-tpm-plugin/releases/download/v${SPIRE_TPM_PLUGIN}/spire_tpm_plugin_tpm_attestor_server_linux_${TARGETARCH}_v${SPIRE_TPM_PLUGIN}.tar.gz
+RUN tar zvxf spire_tpm_plugin_tpm_attestor_server_linux_${TARGETARCH}_v${SPIRE_TPM_PLUGIN}.tar.gz
 
 
 FROM ghcr.io/spiffe/spire-server:${SPIRE_VERSION}
