@@ -7,7 +7,7 @@ on:
         branches: [ "main" ]
 
 env:
-  SPIRE_VERSION: 1.11.1
+  SPIRE_VERSION: 1.11.2
 jobs:
   docker-spire-server:
     runs-on: ubuntu-latest
