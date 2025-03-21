@@ -6,9 +6,17 @@ on:
     pull_request:
         branches: [ "main" ]
 
+env:
+  REGISTRY: ghcr.io
+
 jobs:
   docker-ubuntu-tools:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,19 +30,31 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: set lower case owner name
+        run: |
+          echo "REPOSITORY=${REPOSITORY_NN,,}" >>${GITHUB_ENV}
+        env:
+          REPOSITORY_NN: '${{ github.repository }}'
 
       - name: Build and push ubuntu-tools
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: mattiasgees/ubuntu-tools:${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/ubuntu-tools:${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
 
   docker-spire-tools:
     needs: docker-ubuntu-tools
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,8 +68,15 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: set lower case owner name
+        run: |
+          echo "REPOSITORY=${REPOSITORY_NN,,}" >>${GITHUB_ENV}
+        env:
+          REPOSITORY_NN: '${{ github.repository }}'
 
       - name: Build and push spire-tools
         uses: docker/build-push-action@v6
@@ -57,6 +84,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           file: Dockerfile.spire-tools
-          tags: mattiasgees/spire-tools:${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/spire-tools:${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
           build-args: |
             BUILD_TAG=${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}

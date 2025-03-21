@@ -8,9 +8,16 @@ on:
 
 env:
   SPIRE_VERSION: 1.11.2
+  REGISTRY: ghcr.io
+
 jobs:
   docker-spire-server:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,8 +31,15 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: set lower case owner name
+        run: |
+          echo "REPOSITORY=${REPOSITORY_NN,,}" >>${GITHUB_ENV}
+        env:
+          REPOSITORY_NN: '${{ github.repository }}'
 
       - name: Build and push ubuntu-tools
         uses: docker/build-push-action@v6
@@ -35,4 +49,4 @@ jobs:
           file: Dockerfile.spire-server
           build-args: |
             SPIRE_VERSION=${{ env.SPIRE_VERSION }}
-          tags: mattiasgees/spire-server:${{ env.SPIRE_VERSION }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/spire-server:${{ env.SPIRE_VERSION }}
