@@ -1,9 +1,9 @@
 # https://github.com/spiffe/spire/releases
-ARG SPIRE_VERSION=1.11.2
+ARG SPIRE_VERSION=1.12.2
 # https://github.com/boxboat/spire-tpm-plugin/releases
 ARG SPIRE_TPM_PLUGIN=1.8.7
 
-FROM --platform=$BUILDPLATFORM mattiasgees/ubuntu-tools:latest AS builder
+FROM --platform=$BUILDPLATFORM ghcr.io/mattiasgees/container-images/ubuntu-tools:latest AS builder
 
 ARG SPIRE_TPM_PLUGIN
 ARG TARGETPLATFORM

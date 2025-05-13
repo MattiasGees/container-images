@@ -1,15 +1,15 @@
 # https://github.com/spiffe/spire/releases
-ARG SPIRE_VERSION=1.11.2
+ARG SPIRE_VERSION=1.12.1
 # https://github.com/spiffe/spiffe-helper/releases
-ARG SPIFFE_HELPER_VERSION=0.9.1
+ARG SPIFFE_HELPER_VERSION=0.10.0
 # https://github.com/MattiasGees/spiffe-aws-assume-role/releases
 ARG SPIFFE_AWS_ASSUME_ROLE_VERSION=0.0.1-alpha4
 # https://docs.aws.amazon.com/rolesanywhere/latest/userguide/credential-helper.html
-ARG ROLESANYWHERE_VERSION=1.4.0
+ARG ROLESANYWHERE_VERSION=1.6.0
 
 ARG BUILD_TAG=latest
 
-FROM --platform=$BUILDPLATFORM mattiasgees/ubuntu-tools:${BUILD_TAG} AS builder
+FROM --platform=$BUILDPLATFORM ghcr.io/mattiasgees/container-images/ubuntu-tools:${BUILD_TAG} AS builder
 
 ARG SPIRE_VERSION
 ARG SPIFFE_HELPER_VERSION
@@ -22,8 +22,13 @@ ARG TARGETARCH
 
 RUN wget https://github.com/spiffe/spire/releases/download/v${SPIRE_VERSION}/spire-${SPIRE_VERSION}-${TARGETOS}-${TARGETARCH}-musl.tar.gz
 RUN tar zvxf spire-${SPIRE_VERSION}-${TARGETOS}-${TARGETARCH}-musl.tar.gz
-RUN wget https://github.com/spiffe/spiffe-helper/releases/download/v${SPIFFE_HELPER_VERSION}/spiffe-helper-v${SPIFFE_HELPER_VERSION}.tar.gz
-RUN tar zvxf spiffe-helper-v${SPIFFE_HELPER_VERSION}.tar.gz
+RUN if [ "${TARGETARCH}" = "amd64" ]; then \
+	wget https://github.com/spiffe/spiffe-helper/releases/download/v${SPIFFE_HELPER_VERSION}/spiffe-helper_v${SPIFFE_HELPER_VERSION}_Linux-x86_64.tar.gz && \
+	tar zvxf spiffe-helper_v${SPIFFE_HELPER_VERSION}_Linux-x86_64.tar.gz; \
+  else \
+	wget https://github.com/spiffe/spiffe-helper/releases/download/v${SPIFFE_HELPER_VERSION}/spiffe-helper_v${SPIFFE_HELPER_VERSION}_Linux-${TARGETARCH}.tar.gz && \
+	tar zvxf spiffe-helper_v${SPIFFE_HELPER_VERSION}_Linux-${TARGETARCH}.tar.gz; \
+  fi
 RUN wget https://github.com/MattiasGees/spiffe-aws-assume-role/releases/download/v${SPIFFE_AWS_ASSUME_ROLE_VERSION}/spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
 RUN tar zvxf spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
 RUN wget https://github.com/sigstore/cosign/releases/latest/download/cosign-${TARGETOS}-${TARGETARCH}
@@ -37,7 +42,7 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
 	fi; \
 	wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/${ARCH}/Linux/aws_signing_helper
 
-FROM mattiasgees/ubuntu-tools:${BUILD_TAG} 
+FROM ghcr.io/mattiasgees/container-images/ubuntu-tools:${BUILD_TAG} 
 
 ARG SPIRE_VERSION
 ARG SPIFFE_HELPER_VERSION
