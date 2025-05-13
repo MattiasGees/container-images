@@ -22,8 +22,13 @@ ARG TARGETARCH
 
 RUN wget https://github.com/spiffe/spire/releases/download/v${SPIRE_VERSION}/spire-${SPIRE_VERSION}-${TARGETOS}-${TARGETARCH}-musl.tar.gz
 RUN tar zvxf spire-${SPIRE_VERSION}-${TARGETOS}-${TARGETARCH}-musl.tar.gz
-RUN wget https://github.com/spiffe/spiffe-helper/releases/download/v${SPIFFE_HELPER_VERSION}/spiffe-helper_v${SPIFFE_HELPER_VERSION}_Linux-${TARGETARCH}.tar.gz
-RUN tar zvxf spiffe-helper_v${SPIFFE_HELPER_VERSION}_Linux-${TARGETARCH}.tar.gz
+RUN if [ "${TARGETARCH}" = "amd64" ]; then \
+	wget https://github.com/spiffe/spiffe-helper/releases/download/v${SPIFFE_HELPER_VERSION}/spiffe-helper_v${SPIFFE_HELPER_VERSION}_Linux-x86_64.tar.gz && \
+	tar zvxf spiffe-helper_v${SPIFFE_HELPER_VERSION}_Linux-x86_64.tar.gz; \
+  else \
+	wget https://github.com/spiffe/spiffe-helper/releases/download/v${SPIFFE_HELPER_VERSION}/spiffe-helper_v${SPIFFE_HELPER_VERSION}_Linux-${TARGETARCH}.tar.gz && \
+	tar zvxf spiffe-helper_v${SPIFFE_HELPER_VERSION}_Linux-${TARGETARCH}.tar.gz; \
+  fi
 RUN wget https://github.com/MattiasGees/spiffe-aws-assume-role/releases/download/v${SPIFFE_AWS_ASSUME_ROLE_VERSION}/spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
 RUN tar zvxf spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
 RUN wget https://github.com/sigstore/cosign/releases/latest/download/cosign-${TARGETOS}-${TARGETARCH}
