@@ -45,7 +45,7 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
 	fi; \
 	wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/${ARCH}/Linux/aws_signing_helper
 RUN wget https://github.com/square/certigo/releases/download/v${CERTIGO_VERSION}/certigo-linux-amd64
-RUN tar zvxf certigo-linux-amd64.tar.gz
+RUN tar zvxf certigo-linux-amd64
 FROM ghcr.io/mattiasgees/container-images/ubuntu-tools:${BUILD_TAG} 
 
 ARG SPIRE_VERSION
