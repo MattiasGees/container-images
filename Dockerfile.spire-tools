@@ -6,6 +6,8 @@ ARG SPIFFE_HELPER_VERSION=0.10.0
 ARG SPIFFE_AWS_ASSUME_ROLE_VERSION=0.0.1-alpha4
 # https://docs.aws.amazon.com/rolesanywhere/latest/userguide/credential-helper.html
 ARG ROLESANYWHERE_VERSION=1.6.0
+# https://github.com/square/certigo/releases
+ARG CERTIGO_VERSION=1.16.0
 
 ARG BUILD_TAG=latest
 
@@ -15,6 +17,7 @@ ARG SPIRE_VERSION
 ARG SPIFFE_HELPER_VERSION
 ARG SPIFFE_AWS_ASSUME_ROLE_VERSION
 ARG ROLESANYWHERE_VERSION
+ARG CERTIGO_VERSION
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 ARG TARGETOS
@@ -40,7 +43,8 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
 	echo "Unsupported architecture: ${TARGETARCH}"; \
 	exit 1; \
 	fi; \
-	wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/${ARCH}/Linux/aws_signing_helper
+	wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/${ARCH}/Linux/aws_signing_helper && chmod +x aws_signing_helper
+RUN wget https://github.com/square/certigo/releases/download/v${CERTIGO_VERSION}/certigo-linux-amd64 && chmod +x certigo-linux-amd64
 
 FROM ghcr.io/mattiasgees/container-images/ubuntu-tools:${BUILD_TAG} 
 
@@ -73,6 +77,7 @@ COPY --from=builder /spiffe-helper /usr/bin/spiffe-helper
 COPY --from=builder /spiffe-aws-assume-role /usr/bin/spiffe-aws-assume-role
 COPY --from=builder /cosign-${TARGETOS}-${TARGETARCH} /usr/bin/cosign
 COPY --from=builder /aws_signing_helper /usr/bin/aws_signing_helper
+COPY --from=builder /certigo-linux-amd64 /usr/bin/certigo
 RUN if [ "${TARGETARCH}" = "amd64" ]; then \
 	ARCH="x86_64"; \
 	elif [ "${TARGETARCH}" = "arm64" ]; then \
