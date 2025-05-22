@@ -43,9 +43,9 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
 	echo "Unsupported architecture: ${TARGETARCH}"; \
 	exit 1; \
 	fi; \
-	wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/${ARCH}/Linux/aws_signing_helper
-RUN wget https://github.com/square/certigo/releases/download/v${CERTIGO_VERSION}/certigo-linux-amd64
-RUN tar zvxf certigo-linux-amd64
+	wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/${ARCH}/Linux/aws_signing_helper && chmod +x aws_signing_helper
+RUN wget https://github.com/square/certigo/releases/download/v${CERTIGO_VERSION}/certigo-linux-amd64 && chmod +x certigo-linux-amd64
+
 FROM ghcr.io/mattiasgees/container-images/ubuntu-tools:${BUILD_TAG} 
 
 ARG SPIRE_VERSION
