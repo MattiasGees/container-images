@@ -1,5 +1,5 @@
 # https://github.com/spiffe/spire/releases
-ARG SPIRE_VERSION=1.12.4
+ARG SPIRE_VERSION=1.13.0
 # https://github.com/boxboat/spire-tpm-plugin/releases
 ARG SPIRE_TPM_PLUGIN=1.8.7
 
