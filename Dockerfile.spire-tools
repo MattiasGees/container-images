@@ -1,13 +1,13 @@
 # https://github.com/spiffe/spire/releases
-ARG SPIRE_VERSION=1.12.1
+ARG SPIRE_VERSION=1.13.0
 # https://github.com/spiffe/spiffe-helper/releases
-ARG SPIFFE_HELPER_VERSION=0.10.0
+ARG SPIFFE_HELPER_VERSION=0.10.1
 # https://github.com/MattiasGees/spiffe-aws-assume-role/releases
 ARG SPIFFE_AWS_ASSUME_ROLE_VERSION=0.0.1-alpha4
 # https://docs.aws.amazon.com/rolesanywhere/latest/userguide/credential-helper.html
-ARG ROLESANYWHERE_VERSION=1.6.0
+ARG ROLESANYWHERE_VERSION=1.7.1
 # https://github.com/square/certigo/releases
-ARG CERTIGO_VERSION=1.16.0
+ARG CERTIGO_VERSION=1.17.1
 
 ARG BUILD_TAG=latest
 
