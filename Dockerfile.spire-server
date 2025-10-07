@@ -1,7 +1,7 @@
 # https://github.com/spiffe/spire/releases
 ARG SPIRE_VERSION=1.13.1
 # https://github.com/boxboat/spire-tpm-plugin/releases
-ARG SPIRE_TPM_PLUGIN=1.8.7
+ARG SPIRE_TPM_PLUGIN=1.9.0
 
 FROM --platform=$BUILDPLATFORM ghcr.io/mattiasgees/container-images/ubuntu-tools:latest AS builder
 
@@ -11,7 +11,7 @@ ARG BUILDPLATFORM
 ARG TARGETOS
 ARG TARGETARCH
 
-RUN wget https://github.com/boxboat/spire-tpm-plugin/releases/download/v${SPIRE_TPM_PLUGIN}/spire_tpm_plugin_tpm_attestor_server_linux_${TARGETARCH}_v${SPIRE_TPM_PLUGIN}.tar.gz
+RUN wget https://github.com/spiffe/spire-tpm-plugin/releases/download/v${SPIRE_TPM_PLUGIN}/spire_tpm_plugin_tpm_attestor_server_linux_${TARGETARCH}_v${SPIRE_TPM_PLUGIN}.tar.gz
 RUN tar zvxf spire_tpm_plugin_tpm_attestor_server_linux_${TARGETARCH}_v${SPIRE_TPM_PLUGIN}.tar.gz
 
 
