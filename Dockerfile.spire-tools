@@ -1,5 +1,5 @@
 # https://github.com/spiffe/spire/releases
-ARG SPIRE_VERSION=1.13.1
+ARG SPIRE_VERSION=1.13.2
 # https://github.com/spiffe/spiffe-helper/releases
 ARG SPIFFE_HELPER_VERSION=0.10.1
 # https://github.com/MattiasGees/spiffe-aws-assume-role/releases
