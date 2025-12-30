@@ -7,7 +7,7 @@ on:
         branches: [ "main" ]
 
 env:
-  SPIRE_VERSION: 1.13.3
+  SPIRE_VERSION: 1.14.0
   REGISTRY: ghcr.io
 
 jobs:
