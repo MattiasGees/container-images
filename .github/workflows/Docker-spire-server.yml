@@ -50,4 +50,4 @@ jobs:
           file: Dockerfile.spire-server
           build-args: |
             SPIRE_VERSION=${{ env.SPIRE_VERSION }}
-          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/spire-server:${{ env.SPIRE_VERSION }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/spire-server:${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || env.SPIRE_VERSION }}
