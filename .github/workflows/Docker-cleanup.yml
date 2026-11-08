@@ -1,0 +1,26 @@
+name: Docker Image cleanup
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    types: [ closed ]
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: Comma-separated image tags to delete
+        required: true
+
+jobs:
+  delete-images:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Delete temporary images
+        uses: dataaxiom/ghcr-cleanup-action@d52806a0dc70b430571a37da1fde39733ffd640f # v1.2.2
+        with:
+          packages: container-images/ubuntu-tools,container-images/spire-tools,container-images/spire-server
+          delete-tags: ${{ inputs.tags || format('pr-{0}', github.event.pull_request.number) }}
+          exclude-tags: latest,*.*.*
+          validate: true
