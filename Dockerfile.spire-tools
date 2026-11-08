@@ -14,9 +14,7 @@ ARG ROLESANYWHERE_VERSION=1.8.6
 # renovate: datasource=github-releases depName=square/certigo
 ARG CERTIGO_VERSION=1.18.2
 
-ARG BUILD_TAG=latest
-
-FROM --platform=$BUILDPLATFORM ghcr.io/mattiasgees/container-images/ubuntu-tools:${BUILD_TAG} AS builder
+FROM --platform=$BUILDPLATFORM ghcr.io/mattiasgees/container-images/ubuntu-tools:latest AS builder
 
 ARG SPIRE_VERSION
 ARG SPIFFE_HELPER_VERSION
@@ -51,7 +49,7 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
 	wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/${ARCH}/Linux/Amzn2023/aws_signing_helper && chmod +x aws_signing_helper
 RUN wget https://github.com/square/certigo/releases/download/v${CERTIGO_VERSION}/certigo-${TARGETOS}-${TARGETARCH} && chmod +x certigo-${TARGETOS}-${TARGETARCH}
 
-FROM ghcr.io/mattiasgees/container-images/ubuntu-tools:${BUILD_TAG} 
+FROM ghcr.io/mattiasgees/container-images/ubuntu-tools:latest
 
 ARG SPIRE_VERSION
 ARG SPIFFE_HELPER_VERSION

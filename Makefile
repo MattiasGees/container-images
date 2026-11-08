@@ -1,6 +1,7 @@
 .DEFAULT_GOAL := build
 
 IMAGE_NAME ?= mattiasgees/ubuntu-tools:latest
+PLATFORMS ?= linux/amd64 linux/arm64
 export DOCKER_CLI_EXPERIMENTAL=enabled
 
 .PHONY: build # Build the container image
@@ -11,6 +12,13 @@ build:
 		--tag $(IMAGE_NAME) \
 		--file Dockerfile \
 		.
+
+.PHONY: test # Build and test every image on each platform
+test:
+	@for platform in $(PLATFORMS); do \
+		docker buildx bake --set "*.platform=$$platform" --load && \
+		tests/smoke.sh $$platform || exit 1; \
+	done
 
 .PHONY: publish # Push all the image to the remote registry
 publish:

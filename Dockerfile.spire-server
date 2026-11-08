@@ -1,4 +1,5 @@
 # https://github.com/spiffe/spire/releases
+# renovate: datasource=docker depName=ghcr.io/spiffe/spire-server
 ARG SPIRE_VERSION=1.16.0
 # https://github.com/spiffe/spire-tpm-plugin/releases
 # renovate: datasource=github-releases depName=spiffe/spire-tpm-plugin
