@@ -1,6 +1,7 @@
 # https://github.com/spiffe/spire/releases
 ARG SPIRE_VERSION=1.16.0
 # https://github.com/spiffe/spire-tpm-plugin/releases
+# renovate: datasource=github-releases depName=spiffe/spire-tpm-plugin
 ARG SPIRE_TPM_PLUGIN=1.11.3
 
 FROM --platform=$BUILDPLATFORM ghcr.io/mattiasgees/container-images/ubuntu-tools:latest AS builder
