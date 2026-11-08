@@ -8,6 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  IMAGE_TAG: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'latest' }}
 
 jobs:
   docker-ubuntu-tools:
@@ -45,7 +46,7 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/ubuntu-tools:${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/ubuntu-tools:${{ env.IMAGE_TAG }}
 
   docker-spire-tools:
     needs: docker-ubuntu-tools
@@ -84,6 +85,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           file: Dockerfile.spire-tools
-          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/spire-tools:${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/spire-tools:${{ env.IMAGE_TAG }}
           build-args: |
-            BUILD_TAG=${{ github.event_name == 'pull_request' && github.head_ref || 'latest' }}
+            BUILD_TAG=${{ env.IMAGE_TAG }}
