@@ -34,7 +34,7 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
   fi
 RUN wget https://github.com/MattiasGees/spiffe-aws-assume-role/releases/download/v${SPIFFE_AWS_ASSUME_ROLE_VERSION}/spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
 RUN tar zvxf spiffe-aws-assume-role-v${SPIFFE_AWS_ASSUME_ROLE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz 
-RUN wget https://github.com/sigstore/cosign/releases/latest/download/cosign-${TARGETOS}-${TARGETARCH}
+RUN wget https://github.com/sigstore/cosign/releases/latest/download/cosign-${TARGETOS}-${TARGETARCH} && chmod +x cosign-${TARGETOS}-${TARGETARCH}
 RUN if [ "${TARGETARCH}" = "amd64" ]; then \
 	ARCH="X86_64"; \
 	elif [ "${TARGETARCH}" = "arm64" ]; then \
@@ -44,7 +44,7 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
 	exit 1; \
 	fi; \
 	wget https://rolesanywhere.amazonaws.com/releases/${ROLESANYWHERE_VERSION}/${ARCH}/Linux/Amzn2023/aws_signing_helper && chmod +x aws_signing_helper
-RUN wget https://github.com/square/certigo/releases/download/v${CERTIGO_VERSION}/certigo-linux-amd64 && chmod +x certigo-linux-amd64
+RUN wget https://github.com/square/certigo/releases/download/v${CERTIGO_VERSION}/certigo-${TARGETOS}-${TARGETARCH} && chmod +x certigo-${TARGETOS}-${TARGETARCH}
 
 FROM ghcr.io/mattiasgees/container-images/ubuntu-tools:${BUILD_TAG} 
 
@@ -79,7 +79,7 @@ COPY --from=builder /spiffe-helper /usr/bin/spiffe-helper
 COPY --from=builder /spiffe-aws-assume-role /usr/bin/spiffe-aws-assume-role
 COPY --from=builder /cosign-${TARGETOS}-${TARGETARCH} /usr/bin/cosign
 COPY --from=builder /aws_signing_helper /usr/bin/aws_signing_helper
-COPY --from=builder /certigo-linux-amd64 /usr/bin/certigo
+COPY --from=builder /certigo-${TARGETOS}-${TARGETARCH} /usr/bin/certigo
 RUN if [ "${TARGETARCH}" = "amd64" ]; then \
 	ARCH="x86_64"; \
 	elif [ "${TARGETARCH}" = "arm64" ]; then \
