@@ -3,7 +3,7 @@
 ARG SPIRE_VERSION=1.16.0
 # https://github.com/spiffe/spiffe-helper/releases
 # renovate: datasource=github-releases depName=spiffe/spiffe-helper
-ARG SPIFFE_HELPER_VERSION=0.12.3
+ARG SPIFFE_HELPER_VERSION=0.12.4
 # https://github.com/MattiasGees/spiffe-aws-assume-role/releases
 # renovate: datasource=github-releases depName=MattiasGees/spiffe-aws-assume-role
 ARG SPIFFE_AWS_ASSUME_ROLE_VERSION=0.0.1-alpha4
