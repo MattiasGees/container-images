@@ -13,6 +13,7 @@ repo_root=$(cd "$(dirname "$0")/.." && pwd)
 ubuntu_tools="container-images-test/ubuntu-tools:test"
 spire_tools="container-images-test/spire-tools:test"
 spire_server="container-images-test/spire-server:test"
+actions_runner="container-images-test/actions-runner:test"
 
 # elf_machine is the e_machine field of an ELF header for this platform.
 case "$platform" in
@@ -141,9 +142,36 @@ test_spire_server_loads_tpm_plugin() {
   docker rm --force "$container" >/dev/null
 }
 
+test_actions_runner() {
+  local binary
+  for binary in kubectl kind helm; do
+    expect_arch "$actions_runner" "/usr/local/bin/$binary"
+  done
+  expect_arch "$actions_runner" /usr/bin/docker
+
+  expect_output "$actions_runner" "$(pinned Dockerfile.actions-runner RUNNER_VERSION)" /home/runner/bin/Runner.Listener --version
+  expect_output "$actions_runner" "v$(pinned Dockerfile.actions-runner KUBECTL_VERSION)" kubectl version --client
+  expect_output "$actions_runner" "v$(pinned Dockerfile.actions-runner KIND_VERSION)" kind version
+  expect_output "$actions_runner" "v$(pinned Dockerfile.actions-runner HELM_VERSION)" helm version --short
+  expect_output "$actions_runner" "GNU Make" make --version
+  expect_output "$actions_runner" "Python 3" python3 --version
+  expect_output "$actions_runner" "OpenSSL" openssl version
+  expect_output "$actions_runner" "Docker version" docker --version
+  expect_output "$actions_runner" "buildx" docker buildx version
+  expect_output "$actions_runner" "git version" git --version
+
+  # ARC starts /home/runner/run.sh as the runner user, in the docker group.
+  expect_output "$actions_runner" "runner" id -un
+  expect_output "$actions_runner" "docker" id -Gn
+  # go test -race needs a working C toolchain.
+  expect_output "$actions_runner" "cc works" bash -c \
+    'printf "#include <stdio.h>\nint main(void){puts(\"cc works\");return 0;}\n" | gcc -x c - -o /tmp/cc && /tmp/cc'
+}
+
 test_ubuntu_tools
 test_spire_tools
 test_spire_server
+test_actions_runner
 
 if [ "$failures" -gt 0 ]; then
   echo "$failures check(s) failed on $platform"
