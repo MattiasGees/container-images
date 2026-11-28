@@ -20,7 +20,7 @@ jobs:
       - name: Delete temporary images
         uses: dataaxiom/ghcr-cleanup-action@d52806a0dc70b430571a37da1fde39733ffd640f # v1.2.2
         with:
-          packages: container-images/ubuntu-tools,container-images/spire-tools,container-images/spire-server
+          packages: container-images/ubuntu-tools,container-images/spire-tools,container-images/spire-server,container-images/actions-runner
           delete-tags: ${{ inputs.tags || format('pr-{0}', github.event.pull_request.number) }}
           exclude-tags: latest,*.*.*
           validate: true

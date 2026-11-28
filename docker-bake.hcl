@@ -16,7 +16,7 @@ variable "SPIRE_SERVER_TAG" {
 }
 
 group "default" {
-  targets = ["ubuntu-tools", "spire-tools", "spire-server"]
+  targets = ["ubuntu-tools", "spire-tools", "spire-server", "actions-runner"]
 }
 
 target "_common" {
@@ -45,4 +45,10 @@ target "spire-server" {
     "ghcr.io/mattiasgees/container-images/ubuntu-tools:latest" = "target:ubuntu-tools"
   }
   tags = ["${REPOSITORY}/spire-server:${SPIRE_SERVER_TAG}"]
+}
+
+target "actions-runner" {
+  inherits   = ["_common"]
+  dockerfile = "Dockerfile.actions-runner"
+  tags       = ["${REPOSITORY}/actions-runner:${TAG}"]
 }

@@ -1,0 +1,57 @@
+# GitHub Actions runner for Actions Runner Controller (ARC) on the Hetzner
+# cluster (MattiasGees/k8s-config, config/bases/actions-runner-controller).
+#
+# ARC's runner image is minimal. This adds what jobs expect from GitHub's
+# ubuntu-latest image and don't install themselves: make and gcc (go test
+# -race needs cgo), python3, openssl, and helm, kind and kubectl. Docker comes
+# with the base image and talks to the Docker-in-Docker sidecar.
+
+# https://github.com/actions/runner/releases
+# renovate: datasource=docker depName=ghcr.io/actions/actions-runner
+ARG RUNNER_VERSION=2.338.2
+# https://github.com/kubernetes/kubernetes/releases
+# renovate: datasource=github-releases depName=kubernetes/kubernetes
+ARG KUBECTL_VERSION=1.37.3
+# https://github.com/kubernetes-sigs/kind/releases
+# renovate: datasource=github-releases depName=kubernetes-sigs/kind
+ARG KIND_VERSION=0.33.0
+# https://github.com/helm/helm/releases
+# renovate: datasource=github-releases depName=helm/helm
+ARG HELM_VERSION=4.3.2
+
+FROM ghcr.io/actions/actions-runner:${RUNNER_VERSION}
+
+ARG KUBECTL_VERSION
+ARG KIND_VERSION
+ARG HELM_VERSION
+ARG TARGETOS
+ARG TARGETARCH
+
+USER root
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    ca-certificates \
+    openssl \
+    python3 \
+    xz-utils \
+    zip \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /tmp/tools
+
+# Each download is checked against the checksum its project publishes.
+RUN curl -fsSLO "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl" \
+ && echo "$(curl -fsSL "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl.sha256")  kubectl" | sha256sum --check \
+ && install -m 0755 kubectl /usr/local/bin/kubectl \
+ && curl -fsSLo kind "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-${TARGETOS}-${TARGETARCH}" \
+ && echo "$(curl -fsSL "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-${TARGETOS}-${TARGETARCH}.sha256sum" | cut -d' ' -f1)  kind" | sha256sum --check \
+ && install -m 0755 kind /usr/local/bin/kind \
+ && curl -fsSLO "https://get.helm.sh/helm-v${HELM_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz" \
+ && echo "$(curl -fsSL "https://get.helm.sh/helm-v${HELM_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz.sha256sum" | cut -d' ' -f1)  helm-v${HELM_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz" | sha256sum --check \
+ && tar -xzf "helm-v${HELM_VERSION}-${TARGETOS}-${TARGETARCH}.tar.gz" \
+ && install -m 0755 "${TARGETOS}-${TARGETARCH}/helm" /usr/local/bin/helm \
+ && cd / && rm -rf /tmp/tools
+
+WORKDIR /home/runner
+USER runner
